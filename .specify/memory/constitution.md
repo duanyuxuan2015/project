@@ -1,50 +1,183 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: [INITIAL] → 1.0.0
+- New principles added:
+  * P1: 用户价值优先 (User Value First)
+  * P2: 测试驱动开发 (Test-Driven Development)
+  * P3: 简洁性原则 (Simplicity Principle)
+  * P4: 渐进式交付 (Incremental Delivery)
+  * P5: 可观测性 (Observability)
+- Sections added:
+  * Core Principles (5 principles defined)
+  * Development Standards
+  * Quality Gates
+  * Governance
+- Templates requiring updates:
+  * ✅ .specify/templates/plan-template.md - Reviewed, Constitution Check section aligned
+  * ✅ .specify/templates/spec-template.md - Reviewed, requirements aligned with principles
+  * ✅ .specify/templates/tasks-template.md - Reviewed, task structure supports incremental delivery
+  * ✅ .specify/templates/commands/*.md - No agent-specific references found
+- Follow-up TODOs: None - all placeholders filled
+-->
+
+# Project Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. 用户价值优先 (User Value First)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+每个功能决策必须以电商用户价值为最终评判标准（覆盖 C 端消费者、B 端商户 / 运营、供应链端等多角色）：
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- **功能必须解决真实用户问题** - 不为 "可能需要" 的场景构建功能（如非核心的营销玩法不提前开发）；核心场景（下单、支付、退款、售后）必须优先保障体验
+- **价值可衡量** - 每个功能需定义电商场景化成功标准（如下单转化率提升 X%、支付成功率≥99.9%、售后工单处理时长缩短 Y 分钟）
+- **用户场景驱动** - 所有功能从电商用户故事开始（如 "消费者 3 步完成下单"、"商户 1 分钟完成库存修改"），而非技术架构
+- **独立性优先** - 电商核心用户故事（下单、支付、库存扣减）应可独立实现、测试和交付，不耦合非核心流程
+- **多角色价值平衡** - 兼顾消费者体验、商户效率、平台合规性（如促销规则需同时满足用户优惠感知和商户利润管控）
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**理由**: 电商微服务的技术决策需服务于交易转化、用户留存、商户履约等核心价值，而非单纯追求技术架构完美。
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. 测试驱动开发 (Test-Driven Development) - 不可协商
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+测试是电商微服务功能完成的唯一标准，核心场景需覆盖极端流量 / 异常场景：
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- **TDD 强制执行** - 测试必须先写并获得产品 / 运营批准，确保测试失败后才实现功能；核心场景（下单、支付、库存扣减）需优先编写测试
+- **Red-Green-Refactor** - 严格遵循测试失败 (红)→测试通过 (绿)→重构循环
+- 测试分层要求（适配电商微服务）:
+  - 契约测试：微服务间通信（如订单服务↔支付服务、库存服务↔订单服务）、第三方支付 / 物流接口契约
+  - 集成测试：电商核心用户旅程（下单→支付→扣库存→生成物流单）、跨服务异常场景（支付超时、库存不足）
+  - 单元测试：复杂逻辑（促销规则计算、价格兜底、库存锁释放）、边界条件（超卖、重复下单、退款金额计算）
+  - 性能测试：核心接口（下单 / 支付）需提前定义压测标准（如支持 1000 TPS、99% 响应时间 < 200ms）
+- **测试必须在规范中明确** - 电商合规场景（支付风控、隐私数据脱敏）的测试要求需在规范中明确，无明确要求则不编写测试
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**理由**: 电商交易场景涉及资金、库存、用户数据，TDD 是保障核心流程正确性、预防资损 / 超卖等重大问题的核心手段。
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. 简洁性原则 (Simplicity Principle)
+
+电商微服务的复杂性必须有明确理由，避免过度拆分 / 设计：
+
+- **从简单方案开始** - 优先选择最简单可行的实现（如促销规则先基于配置，而非定制化引擎）
+- **YAGNI 原则** - 不为假设的未来需求构建功能（如大促扩容方案仅针对已知峰值设计，不提前适配远期流量）
+- 复杂性需要证明 \- 任何引入复杂性的决策（如微服务拆分、分布式事务）必须：
+  - 文档化为何需要（如 "订单拆分需支持多商户履约"）
+  - 证明更简单方案不足（如 "单体订单服务无法支撑大促流量"）
+  - 获得产品 / 技术负责人双批准
+- **技术债务显式化** - 如为赶大促上线引入临时方案（如硬编码部分促销规则），必须记录为技术债务并明确大促后偿还计划
+- **微服务拆分粒度简洁** - 避免 "过细拆分"（如不将 "收货地址" 拆分为独立服务），拆分仅以 "业务闭环 + 可独立扩容" 为标准
+
+**理由**: 电商微服务的简单性直接影响运维成本、故障排查效率，大促期间复杂系统的故障风险呈指数级上升。
+
+### IV. 渐进式交付 (Incremental Delivery)
+
+电商功能按优先级分阶段交付，适配大促迭代节奏和风险管控：
+
+- **优先级驱动** - 电商用户故事必须标记优先级（P0/MVP - 核心交易、P1 - 大促必备、P2 - 体验优化、P3 - 长期迭代）
+- **独立可测试** - 每个用户故事可独立实现、测试和演示（如 "优惠券领取" 功能不依赖 "优惠券使用" 功能完成）
+- **MVP 优先** - P0 功能（下单、支付、退款）优先完成，确保最小可交易闭环；大促前仅上线经过充分验证的增量
+- **持续价值** - 每个增量都为用户增加价值，不破坏已有核心功能（如新增营销玩法不得影响下单流程）
+- **并行开发** - 基础设施（如缓存、消息队列）完成后，不同优先级故事可并行开发；大促前 1 个月停止非核心功能并行开发
+- **灰度交付** - 核心功能（如支付流程优化）需支持灰度发布（按用户 / 商户比例），避免全量上线风险
+
+**理由**: 电商业务迭代快（大促、日常营销），渐进交付降低全量上线风险，确保持续交付交易价值而非推迟到 "大版本完成"。
+
+### V. 可观测性 (Observability)
+
+电商微服务的行为必须可理解、可调试，核心是快速定位交易 / 资损问题：
+
+- **结构化日志** - 所有关键电商操作记录结构化日志（含订单号 / 支付单号 / 用户 ID / 商户 ID 等核心维度），日志需支持链路追踪
+- 关键指标（电商场景化）:
+  - 业务 KPI: 订单转化率、支付成功率、退款率、库存准确率、优惠券核销率
+  - 技术 KPI: 核心接口 TPS / 响应时间、缓存命中率、消息队列堆积量、服务错误率
+- **可调试性优先** - 优先选择易于调试的协议和格式（如 HTTP/JSON），第三方支付 / 物流接口需提供沙箱环境
+- **错误处理透明** - 电商核心流程错误（支付失败、库存扣减失败）必须记录完整上下文（如失败原因、请求参数、用户信息），支持一键排查
+- **性能可测量** - 核心路径（下单、支付）必须有性能指标，大促前需完成全链路压测并记录基准值
+- **资损可监控** - 新增资金相关功能必须配置资损监控告警（如退款金额异常、库存扣减与订单不匹配）
+
+**理由**: 电商交易场景对故障恢复时效要求极高（分钟级），充分的可观测性是快速定位资损、交易异常的核心保障。
+
+## Development Standards
+
+### 代码质量
+
+- **DRY 原则** - 提取电商通用功能为可复用组件（如价格计算、地址解析、脱敏工具）
+
+- **现代语法** - 使用语言的最新稳定版本特性，兼顾性能（如 Java 优先使用 JDK17 + 的虚拟线程优化高并发）
+
+- **安全优先（电商核心）**:
+
+  - 不在代码中硬编码密钥 / 密码，使用配置中心管理
+
+  - 支付相关接口必须做签名校验、防重放攻击
+
+  - 用户隐私数据（手机号、身份证、银行卡）必须脱敏存储 / 传输
+
+  - 防 SQL 注入、XSS 攻击（尤其是商户后台、用户下单页）
+
+- **显式优于隐式** - 避免魔法值（如订单状态码需定义枚举），代码意图应清晰（如 "库存锁超时时间" 需显式注释）
+
+### Git工作流
+
+- **有意义的提交信息** - 遵循 Conventional Commits 规范，电商核心场景需标注模块（如`feat(order): 新增订单超时自动取消`）
+- **频繁提交** - 每完成一个任务或逻辑组即提交，大促期间核心代码提交需双人审核
+- **分支策略** - 功能分支命名: `[模块-优先级-短名称]`（如`[payment-P0-refund-api]`）；大促分支需单独隔离，禁止直接合并
+
+### 微服务核心规范
+
+- **服务拆分** - 按 "业务域闭环" 拆分（订单、支付、库存、用户、营销、物流），避免跨域耦合
+- **接口设计** - 核心接口需遵循 RESTful 规范，支持幂等性（如支付回调、库存扣减接口必须幂等）
+- **数据存储** - 按业务域分库分表，核心表（订单表、支付表）需提前规划分片策略（如按用户 ID / 订单号哈希）
+- **高可用设计** - 核心服务必须设计降级策略（如大促期间关闭非核心营销接口，保障下单流程）；依赖的第三方服务（支付 / 物流）需提供降级兜底方案
+- **缓存策略** - 热点数据（商品信息、用户优惠券）需缓存，设置合理过期时间；缓存更新需避免缓存穿透 / 击穿 / 雪崩
+- **消息队列** - 异步流程（订单创建后通知库存、支付成功后通知物流）必须使用消息队列，确保消息不丢失（开启持久化、重试机制）
+- **数据一致性** - 分布式事务优先采用 "最终一致性"（如订单创建→库存扣减→支付确认，通过消息补偿保证一致性），避免强一致性导致性能瓶颈
+
+### 技术栈选择
+
+- **现代稳定版本** - 使用语言的最新稳定版本
+- **合理默认** - 优先选择行业标准和社区支持的工具
+- **避免过度工程** - 工具选择应匹配问题复杂度
+
+## Quality Gates
+
+在进入实现阶段前，必须通过以下关卡：
+
+1. **规范质量检查** - 规范必须完整、无歧义、可测试；电商核心场景（下单、支付、退款）需补充异常场景说明
+2. **宪章符合性检查** - 设计必须符合所有核心原则；微服务拆分 / 接口设计需验证是否满足高可用、幂等性要求
+3. **复杂性审批** - 任何违反简洁性原则的决策必须明确记录理由；大促期间引入的复杂性需额外经过架构师审批
+4. **测试策略确认** - 测试要求在规范阶段明确，核心场景需包含性能测试、容灾测试、资损风险测试
+5. **性能基线检查** - 核心接口需通过压测，达到预设性能基线（如下单接口支持 1000 TPS，99% 响应时间 < 200ms）
+6. **安全合规检查** - 支付相关功能需符合监管要求（如 PCI DSS），用户隐私数据处理需符合《个人信息保护法》
+7. **容灾方案检查** - 核心服务需提供故障演练报告（如服务不可用、数据库宕机的应对方案）
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### 宪章效力
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+- **最高优先级** - 宪章原则覆盖所有其他实践和流程；大促期间可临时调整非核心原则，但需记录并事后复盘
+- **强制符合** - 所有 PR / 审查必须验证是否符合宪章原则；电商核心代码（支付、库存）的 PR 需技术负责人 + 产品负责人双审核
+- **持续改进** - 宪章可根据大促复盘、线上故障、行业合规要求修订
+
+### 修正流程
+
+- **修正必须文档化** - 任何原则变更需记录理由和影响；电商核心原则（如支付安全、库存准确性）变更需全员评审
+- **迁移计划** - 重大变更需要迁移计划；电商核心服务的原则变更需提前完成灰度验证
+- **版本控制** - 使用语义化版本：
+  - MAJOR: 原则移除或不兼容变更（如微服务拆分规则调整）
+  - MINOR: 新增原则或实质性扩展（如新增 "大促容灾原则"）
+  - PATCH: 措辞澄清、错别字修正
+
+### 微服务治理专项
+
+- **服务注册发现** - 所有微服务需接入注册中心，核心服务需配置健康检查和自动下线机制
+- **配置中心** - 电商核心配置（支付费率、库存阈值、大促开关）需通过配置中心管理，支持动态下发
+- **灰度发布** - 核心功能上线需支持按用户 / 商户 / 地域灰度，灰度期间需实时监控核心指标
+- **合规审计** - 资金相关操作（退款、结算）需保留完整审计日志，日志保存时间符合监管要求（至少 1 年）
+- **故障演练** - 每季度对核心服务（订单、支付、库存）进行故障演练（如服务宕机、网络延迟），优化容灾方案
+- **大促专项治理** - 大促前 1 个月启动全链路压测、代码冻结、应急预案评审；大促后 1 个月完成复盘和技术债务偿还
+
+### 合规性审查
+
+- **设计阶段** - 在计划创建时验证符合性，电商合规场景（支付、隐私、税务）需引入法务评审
+- **实现阶段** - 在代码审查时验证符合性，核心功能需通过安全扫描和渗透测试
+- **事后审查** - 定期（每月）审查核心指标（资损、支付成功率、库存准确率）；大促后专项审查原则遵守情况
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-14 | **Last Amended**: 2026-01-14
