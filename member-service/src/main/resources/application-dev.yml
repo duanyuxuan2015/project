@@ -1,0 +1,28 @@
+spring:
+  # 开发环境数据源配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/member_db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: your_password
+
+  # 开发环境Redis配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+
+  # 开发环境RocketMQ配置
+  rocketmq:
+    name-server: localhost:9876
+
+# 日志配置(开发环境)
+logging:
+  level:
+    root: INFO
+    com.example.ecommerce.member: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n"

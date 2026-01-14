@@ -1,0 +1,130 @@
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# Maven
+.gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+encodings.xml
+misc.xml
+deploymentTargetDropDown.xml
+compiler.xml
+.supplier
+uiDesigner.xml
+textmate.xml
+.jar
+
+# IDE - Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IDE - NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+*.log
+*.nbattrs
+
+# IDE - VS Code
+.vscode/
+*.code-workspace
+*.code-workspace
+
+# Logs
+*.log
+logs/
+log/
+
+# Spring Boot
+spring-boot-starter-parent/
+
+# Application
+application-local.yml
+application-local.properties
+*.local.yml
+*.local.properties
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~.nib
+*.bak
+
+# Coverage
+coverage/
+*.profraw
+*.profdata
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# MyBatis-Plus
+**/generator/
+
+# RocketMQ
+rocketmqlogs/
+
+#Claude
+docs/
+.claude/settings.local.json

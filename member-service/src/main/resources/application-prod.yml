@@ -1,0 +1,40 @@
+spring:
+  # 生产环境数据源配置(使用环境变量)
+  datasource:
+    url: ${DB_URL:jdbc:mysql://${DB_HOST:localhost}:3306/member_db?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
+
+  # 生产环境Redis配置
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE:0}
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 20
+          min-idle: 10
+
+  # 生产环境RocketMQ配置
+  rocketmq:
+    name-server: ${ROCKETMQ_NAME_SERVER:localhost:9876}
+
+# JWT配置(生产环境使用环境变量)
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:604800}
+
+# 日志配置(生产环境)
+logging:
+  level:
+    root: INFO
+    com.example.ecommerce.member: INFO
+    com.baomidou.mybatisplus: WARN
+  file:
+    name: logs/member-service.log
+    max-size: 100MB
+    max-history: 30
+    total-size-cap: 10GB
